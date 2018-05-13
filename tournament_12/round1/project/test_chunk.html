@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Chunk Upload</title>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.21.0/css/jquery.fileupload.min.css">
+</head>
+<body>
+<textarea id="token" rows="5" cols="50"></textarea>
+<form id="fileupload" action="/">
+  <input type="file">
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.21.0/js/vendor/jquery.ui.widget.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.21.0/js/jquery.fileupload.min.js"></script>
+<script>
+  var SERVER_ROOT_URL = 'http://dockerhost';
+
+  var $token = jQuery("#token")
+  var $fileupload = jQuery('#fileupload')
+  $fileupload.fileupload({
+    url: SERVER_ROOT_URL + '/upload/append',
+    maxChunkSize: 4 * 1024 * 1024, // 4 MB
+    beforeSend: function (xhr, data) {
+      xhr.setRequestHeader('Authorization', `Bearer ${$token.val()}`);
+      $fileupload.hide();
+      $token.val('');
+    },
+    done: function (e, data) {
+      $fileupload.show();
+      alert("Done")
+      console.log(data.result);
+      console.log(data.textStatus);
+      console.log(data.jqXHR);
+    },
+    fail: function (data) {
+      // data.errorThrown
+      // data.textStatus;
+      // data.jqXHR;
+      console.error(data);
+      $fileupload.show();
+      alert("Fail!");
+    },
+  })
+</script>
+</body>
+</html>
