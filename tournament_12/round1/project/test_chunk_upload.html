@@ -25,7 +25,7 @@
   var $fileupload = jQuery('#fileupload')
   $fileupload.fileupload({
     url: SERVER_ROOT_URL + '/upload/append',
-    maxChunkSize: 4 * 1024 * 1024, // 4 MB
+    maxChunkSize: 4 * 1024 * 1024, // 4 MB (4194304 but without ending zero byte payload have 4194303 bytes)
     beforeSend: function (xhr, data) {
       xhr.setRequestHeader('Authorization', `Bearer ${$token.val()}`);
       $fileupload.hide();

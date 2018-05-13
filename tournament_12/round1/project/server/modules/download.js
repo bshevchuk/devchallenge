@@ -67,30 +67,34 @@ const downloadHandler = async (req, res) => {
             return new Promise((resolve, reject) => {
               const chunkRangeStart = chunk.range_from;
               const chunkRangeEnd = chunk.range_to;
+              const chunkSize = chunk.size;
 
-              // const startCrossed = between(range.start, chunkRangeStart, chunkRangeEnd);
-              // const endCrossed = between(range.end, chunkRangeStart, chunkRangeEnd);
+              const isFullChunkInside = range.start <= chunkRangeStart && chunkRangeEnd <= range.end;
+              const startCrossed = between(range.start, chunkRangeStart, chunkRangeEnd);
+              const endCrossed = between(range.end, chunkRangeStart, chunkRangeEnd);
+              const isReqRangeCrossedChunkRange =  startCrossed || endCrossed;
 
-              const startCrossed = between(chunkRangeStart, range.start, range.end);
-              const endCrossed = between(chunkRangeEnd, range.start, range.end);
+              if (isFullChunkInside || isReqRangeCrossedChunkRange) {
+                let seekPos = 0;
+                let seekLen = 0;
 
-              if (startCrossed || endCrossed) {
-                let pos = 0;
-                let len = 0;
-
-                if (chunkRangeStart < range.start) {
-                  pos = range.start - chunkRangeStart
-                }
-
-                if (range.end > chunkRangeEnd) {
-                  len = range.end - chunkRangeEnd;
+                if (isFullChunkInside) {
+                  seekLen = chunkSize
                 } else {
-                  len = range.end - chunkRangeStart - pos
+                  const byteCorrection = (isReqRangeCrossedChunkRange ? 1 : 0);
+                  if (chunkRangeStart < range.start) {
+                    seekPos = range.start - chunkRangeStart;
+                  }
+                  if (range.end > chunkRangeEnd) {
+                    seekLen = chunkRangeEnd - range.start + byteCorrection;
+                  } else {
+                    seekLen = range.end - chunkRangeStart - seekPos + byteCorrection;
+                  }
                 }
-                console.log(`ReqRange: ${JSON.stringify(range)} ChunkRange: (${chunk.range_from},${chunk.range_to}) Seek(${pos},${len})`)
+                console.log(`ReqRange: ${JSON.stringify(range)} ChunkRange: (${chunk.range_from},${chunk.range_to}) Seek(${seekPos},${seekLen}|${chunk.size})`)
                 const sourceFile = `${STORAGE_PATH}/${objectId}/${chunk.content_hash}`;
                 try {
-                  const buffer = readChunk.sync(sourceFile, pos, len);
+                  const buffer = readChunk.sync(sourceFile, seekPos, seekLen);
                   res.write(buffer);
                   resolve()
                 } catch (err) {
@@ -120,7 +124,7 @@ const downloadHandler = async (req, res) => {
               stream.on('data', (chunk) => {
                 res.write(chunk)
               });
-              stream.on('err', (err) => {
+              stream.on('error', (err) => {
                 reject(err)
               });
               stream.on('end', () => {

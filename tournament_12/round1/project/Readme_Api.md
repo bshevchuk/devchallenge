@@ -26,7 +26,7 @@
 
 ### 1.1.2) Upload chucked file (multipart/form-data with content-range headers)
 
-  cURL not support content-range for uploading. You can use `test_chunk.html` (it chunks data by 4 MB if file larger).
+  cURL not support content-range for uploading. You can use `test_chunk_upload.html` (it chunks data by 4 MB if file larger).
   
   4 Megabytes of chunk is recommended value because most Cloud Platforms allow this size of request body in their load balancer (e.g. AWS Lambda with API Gateway have limit in 6 mb, Firebase Function - 10 mb)
 
@@ -47,7 +47,11 @@ when finish
   
 ### 2.2) Chunked range (range header)
 
-  `curl -v http://dockerhost/download/nasa/milky-way.jpg -H "Authorization: Bearer $DC12_DOWNLOAD_TOKEN" -r 0-4100`
+  `curl -v http://dockerhost/download/nasa/milky-way.jpg -H "Authorization: Bearer $DC12_DOWNLOAD_TOKEN" -r 5-10`
+  
+  This use inclusion range (e.g. `5-10` is 5,6,7,8,9,10 bytes). 
+  
+  If you uploaded a file with 4mb chunk, you can verify first part like `curl {path to file} -r 0-4194303 | openssl sha256`
 
 
 ## See files in storage

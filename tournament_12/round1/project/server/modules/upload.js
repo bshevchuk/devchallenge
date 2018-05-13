@@ -291,6 +291,14 @@ const finishUploadHandler = async (req, res) => {
     return responseError(res, ERRORS.VERSION_UPLOADED_EARLY);
   }
 
+  if (!objectVersion.total_size) {
+    objectVersion.total_size = objectVersion.blocks.map(block => {
+      return block.size
+    }).reduce((left, right) => {
+      return left + right;
+    }, 0);
+  }
+
   const object = await ObjectModel.findOne({ path: filePath });
 
   objectVersion.completed_at = new Date();
