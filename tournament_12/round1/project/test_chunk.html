@@ -12,12 +12,15 @@
   <input type="file">
 </form>
 
+<p></p>
+<ui id="uploads"></ui>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.21.0/js/vendor/jquery.ui.widget.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.21.0/js/jquery.fileupload.min.js"></script>
 <script>
-  var SERVER_ROOT_URL = 'http://dockerhost';
+  var SERVER_ROOT_URL = 'http://dockerhost'; // TODO change it (if needs)
 
+  var $uploads = jQuery("#uploads")
   var $token = jQuery("#token")
   var $fileupload = jQuery('#fileupload')
   $fileupload.fileupload({
@@ -30,18 +33,25 @@
     },
     done: function (e, data) {
       $fileupload.show();
-      alert("Done")
-      console.log(data.result);
+      var result = data.result;
+      var $li = jQuery('<li>').text('test')
+      $uploads.append($li)
+      alert("Uploaded");
       console.log(data.textStatus);
       console.log(data.jqXHR);
     },
-    fail: function (data) {
-      // data.errorThrown
-      // data.textStatus;
-      // data.jqXHR;
-      console.error(data);
+    fail: function (e, data) {
+      var ajaxResponse = data.response();
+      var response = ajaxResponse.jqXHR.responseJSON;
+      var msg ="Fail! Check developer console"
+      if (response.hasOwnProperty('error_code')) {
+        msg = response['error_code']
+      }
+      if (response.hasOwnProperty('details')) {
+        msg += ": " + response['details']
+      }
+      alert(msg);
       $fileupload.show();
-      alert("Fail!");
     },
   })
 </script>

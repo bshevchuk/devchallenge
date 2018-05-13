@@ -2,9 +2,9 @@
  * Express.js Routes
  * @param app Express Instance
  */
-const uploadHandlers = require('./routes/upload');
-const downloadHandler = require('./routes/download');
-const storageHandler = require('./routes/storage');
+const uploadHandlers = require('./modules/upload');
+const downloadHandler = require('./modules/download');
+const serviceHandlers = require('./modules/service');
 
 module.exports = function (app) {
   /**
@@ -29,11 +29,9 @@ module.exports = function (app) {
    * Service routes
    */
   app.route('/check_status')
-    .get((req, res) => {
-      res.send("ALIVE");
-    });
+    .get(serviceHandlers.instances);
 
   app.route('/storage/browse')
-    .get(storageHandler.browseFiles)
+    .get(serviceHandlers.browseFiles)
   
 };

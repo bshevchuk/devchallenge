@@ -8,16 +8,13 @@ services:
       - mongo
       - redis
     ports:
-      - "80:8080"
+      - "8080"
     links:
       - mongo
       - redis
     environment:
       - MONGOURI=mongodb://mongo:27017/devchallenge
       - REDISURI=redis://redis/1
-      #- JWT_SECRET=custom_jwt_secret
-      #- INSTANCE_ID=cluster_instance1$Sd31s
-      #- MAX_DISK_STORAGE=20971520
     volumes:
       - local_storage:/app/local_storage
 
@@ -34,6 +31,13 @@ services:
     restart: always
     volumes:
       - "/data"
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
 
 volumes:
   local_storage:

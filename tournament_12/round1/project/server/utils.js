@@ -32,13 +32,21 @@ const responseError = (responseContext, errorContext) => {
   } else {
     responseContext.status(400);
   }
+  responseContext.header('DEVCHALLENGE-12-BACKEND-R1', INSTANCE_ID);
   return responseContext.send(response)
 };
 module.exports.responseError = responseError;
 
+/**
+ *
+ * @param x
+ * @param min
+ * @param max
+ * @returns {boolean}
+ */
 const between = (x, min, max) => {
   return x >= min && x <= max;
-}
+};
 module.exports.between = between;
 
 /**
@@ -198,7 +206,10 @@ const verifyFileDownloadToken = (jwtToken, path) => {
 };
 module.exports.verifyFileDownloadToken = verifyFileDownloadToken;
 
-
+/**
+ *
+ * @returns {Promise<any>} { used, free }
+ */
 module.exports.getFreeSpaceInLocalStorage = () => {
   const maxDiskStorage = config.MAX_DISK_STORAGE;
   return new Promise((resolve, reject) => {
@@ -221,6 +232,11 @@ const bytesToMegabytes = (bytes) => {
 };
 exports.bytesToMegabytes = bytesToMegabytes;
 
+/**
+ *
+ * @param contentRangeString
+ * @returns {*}
+ */
 const parseContentRange = (contentRangeString) => {
   const range = contentRange.parse(contentRangeString);
   if (range) {
@@ -231,6 +247,11 @@ const parseContentRange = (contentRangeString) => {
 };
 module.exports.parseContentRange = parseContentRange;
 
+/**
+ *
+ * @param path
+ * @param data
+ */
 const writeToFile = (path, data) => {
   fs.writeFileSync(path, data);
 };

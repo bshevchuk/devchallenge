@@ -43,6 +43,7 @@ const downloadHandler = async (req, res) => {
     }
 
     const responseHeaders = {
+      'DEVCHALLENGE-12-BACKEND-R1': config.INSTANCE_ID,
       // "Content-Type": "application/octet-stream",
       // "Content-Disposition": "attachment; filename=",
 
@@ -61,7 +62,7 @@ const downloadHandler = async (req, res) => {
     if (range) {
       // if needs return a part of file
       return await chunks
-        .reduce(async (promise, chunk) => {
+        .reduce((promise, chunk) => {
           return promise.then(() => {
             return new Promise((resolve, reject) => {
               const chunkRangeStart = chunk.range_from;
@@ -89,8 +90,8 @@ const downloadHandler = async (req, res) => {
                 console.log(`ReqRange: ${JSON.stringify(range)} ChunkRange: (${chunk.range_from},${chunk.range_to}) Seek(${pos},${len})`)
                 const sourceFile = `${STORAGE_PATH}/${objectId}/${chunk.content_hash}`;
                 try {
-                  // const buffer = readChunk.sync(sourceFile, pos, len);
-                  // res.write(buffer);
+                  const buffer = readChunk.sync(sourceFile, pos, len);
+                  res.write(buffer);
                   resolve()
                 } catch (err) {
                   reject(err)

@@ -30,6 +30,7 @@ const prepareUploadHandler = async (req, res) => {
   const uploadPayload = {
     token: uploadToken
   };
+  res.header('DEVCHALLENGE-12-BACKEND-R1', config.INSTANCE_ID);
   res.send(uploadPayload);
 };
 
@@ -245,6 +246,7 @@ const appendUploadHandler = async (req, res) => {
     } else {
       response = await fileProcess(requestFile);
     }
+    res.header('DEVCHALLENGE-12-BACKEND-R1', config.INSTANCE_ID);
     res.send(response);
   };
 
@@ -307,6 +309,7 @@ const finishUploadHandler = async (req, res) => {
       token: utils.createFileDownloadToken(object.path, object.id, objectVersion.id)
     },
   };
+  res.header('DEVCHALLENGE-12-BACKEND-R1', config.INSTANCE_ID);
   res.send(response)
 };
 

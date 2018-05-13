@@ -25,6 +25,7 @@
     "mongoose": "^5.0.18",
     "morgan": "^1.9.0",
     "range-parser": "^1.2.0",
-    "read-chunk": "^2.1.0"
+    "read-chunk": "^2.1.0",
+    "redis": "^2.8.0"
   }
 }

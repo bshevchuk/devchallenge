@@ -11,6 +11,9 @@ config['PORT'] = process.env.PORT || 8080;
 // MongoDB
 config['MONGOURI'] = process.env.MONGOURI;
 
+// Redis (for replica management)
+config['REDISURI'] = process.env.REDISURI;
+
 // auth secret
 config['JWT_SECRET'] = process.env.JWT_SECRET || _genJwtSecret();
 
