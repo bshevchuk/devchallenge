@@ -170,8 +170,9 @@ module.exports.verifyFileUploadToken = verifyFileUploadToken;
 
 /**
  *
- * @param path Path to File
- * @param version Version
+ * @param path Virtual Path to File
+ * @param object Object ID
+ * @param version Version ID
  * @returns {*}
  */
 const createFileDownloadToken = (path, object, version) => {
@@ -227,6 +228,11 @@ module.exports.getFreeSpaceInLocalStorage = () => {
   })
 };
 
+/**
+ *
+ * @param bytes
+ * @returns {string}
+ */
 const bytesToMegabytes = (bytes) => {
   return (bytes / 1024 / 1024).toFixed(2)
 };

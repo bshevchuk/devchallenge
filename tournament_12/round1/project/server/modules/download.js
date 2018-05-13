@@ -5,11 +5,9 @@ const readChunk = require('read-chunk');
 const config = require('../config');
 const STORAGE_PATH = config.LOCAL_STORAGE_PATH;
 const ERRORS = config.ERRORS;
-const isDebug = config.DEBUG === '1';
 
 // Database Models
 const db = require('../db');
-const ObjectModel = db.Object;
 const ObjectVersionModel = db.ObjectVersion;
 
 // Helper

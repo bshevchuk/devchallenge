@@ -89,5 +89,5 @@ function _genInstanceId() {
 }
 
 function _maxDiskStorage() {
-  return 1024 * 1024 * 20 // 20 MB in SI (not ISU)
+  return 1024 * 1024 * 50 // 50 MB in SI (not ISU)
 }

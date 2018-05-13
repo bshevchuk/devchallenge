@@ -5,9 +5,7 @@ const fileType = require('file-type');
 
 const config = require('../config');
 const ERRORS = config.ERRORS;
-const isDebug = config.DEBUG === '1';
 
-const ROOT_PATH = config.ROOT_PATH;
 const STORAGE_PATH = config.LOCAL_STORAGE_PATH;
 
 // Database Models
@@ -53,7 +51,7 @@ const appendUploadHandler = async (req, res) => {
     range = utils.parseContentRange(headerContentRange);
     approximateSize = range.length;
   } else {
-    // default upload (single file)
+    // default upload (single file as stream)
     approximateSize = parseInt(req.headers['content-length']);
   }
 
@@ -61,11 +59,14 @@ const appendUploadHandler = async (req, res) => {
   const sessionKey = requestPayload.sess;
 
   const storage = await utils.getFreeSpaceInLocalStorage();
+  // Return an error if size of file too large that free disk space
+  // this validation wont work for chunked transfers
   if (approximateSize > storage.free) {
     return responseError(res, ERRORS.NO_FREE_SPACE);
   }
 
   let objectVersion = await ObjectVersionModel.findOne({ session_key: sessionKey });
+  // when using used upload token
   if (objectVersion && objectVersion.completed_at) {
     return responseError(res, ERRORS.VERSION_UPLOADED_EARLY);
   }
@@ -262,9 +263,6 @@ const appendUploadHandler = async (req, res) => {
 
   let form = new formidable.IncomingForm();
   form.hash = 'sha256';
-  // if (isDebug) {
-  //   form.uploadDir = `${ROOT_PATH}/tmp_uploads`; // for debug
-  // }
   if (isChuckedTransfer) {
     // our data in body
     form.on('field', onField);
