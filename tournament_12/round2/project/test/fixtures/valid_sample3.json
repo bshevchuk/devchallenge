@@ -1,0 +1,20 @@
+{
+  "judges": {
+    "JUDGE_ONE": {
+      "available": [
+        {
+          "start": "2018-06-03T08:00",
+          "end": "2018-06-03T09:00"
+        }
+      ]
+    },
+    "JUDGE_TWO": {
+      "available": [
+        {
+          "start": "0 8 * * MON-FRI",
+          "end": "0 12 * * MON-FRI"
+        }
+      ]
+    }
+  }
+}

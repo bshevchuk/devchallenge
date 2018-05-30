@@ -1,15 +1,20 @@
 'use strict';
 
-const whenJudgeIsAvailable = require('../service/functions/when_judge_is_available');
+const helper = require('./_helper');
 
 const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-const assert = chai.assert;
+
+const whenJudgeIsAvailable = require('../service/functions/when_judge_is_available');
 
 describe('when_judge_is_available function', () => {
   context("handler", () => {
+    before(async () => {
+      await helper.cleanDatabase()
+    });
+
     it('should be exported', () => {
       expect(whenJudgeIsAvailable.handler).to.be.a('function')
     });
@@ -26,7 +31,7 @@ describe('when_judge_is_available function', () => {
     });
   })
 
-  xcontext('httpHandler', () => {
+  context('httpHandler', () => {
     it('should export a httpHandler function', () => {
       expect(whenJudgeIsAvailable.httpHandler).to.be.a('function')
     });

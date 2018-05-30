@@ -9,7 +9,9 @@
     "npm": "5.6.0"
   },
   "scripts": {
+    "prestart": "node scripts/import_schema.js",
     "start": "node index.js",
+    "dummy_generator": "node scripts/dummy_generator.js",
     "test": "mocha test/**.spec.js"
   },
   "devDependencies": {
@@ -22,9 +24,11 @@
   },
   "dependencies": {
     "body-parser": "^1.18.3",
+    "compression": "^1.7.2",
     "cron-parser": "^2.5.0",
     "express": "^4.16.3",
     "express-promise-router": "^3.0.2",
+    "moment-timezone": "^0.5.17",
     "morgan": "^1.9.0",
     "pg": "^7.4.3"
   }

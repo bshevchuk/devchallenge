@@ -16,7 +16,6 @@ router.post('/create', createAvailability);
  * `date_end` - ISO8601 date format
  * `judge_name` - judge name
  */
-// router.get('/judge_availabilities', whenJudgeIsAvailable);
 router.get('/fetch/:date_start/:date_end/:judge_name', whenJudgeIsAvailable);
 
 /**
@@ -24,7 +23,6 @@ router.get('/fetch/:date_start/:date_end/:judge_name', whenJudgeIsAvailable);
  * `date_start` - ISO8601 date format
  * `date_end` - ISO8601 date format
  */
-// router.get('/list_availabilities', listAvailableJudges);
 router.get('/fetch/:date_start/:date_end', listAvailableJudges);
 
 

@@ -1,10 +1,18 @@
+const moment = require('moment-timezone');
 const db = require('./db');
 const cronParser = require('cron-parser');
 
 const ONE_YEAR = 365 * 24 * 3600 * 1000;
-// const ISO8601 = /^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})[+-](\d{2})\:(\d{2})$/
-const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})$/; // YYYY-MM-DDTHH:MM
+// const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})/; // YYYY-MM-DDTHH:MM
 
+exports.ONE_YEAR = ONE_YEAR;
+
+/**
+ *
+ * @param object
+ * @param property
+ * @returns {boolean}
+ */
 const exists = (object, property = null) => {
   let haveProp = true;
   if (property !== null) {
@@ -12,7 +20,6 @@ const exists = (object, property = null) => {
   }
   return typeof(object) !== "undefined" && object !== null && haveProp;
 };
-
 exports.exists = exists;
 
 /**
@@ -29,9 +36,9 @@ exports.transformUsername = (rawUsername) => {
  * @param rawString
  * @returns {boolean}
  */
-exports.isDateISO = (rawString) => {
-  return ISO_DATE.test(rawString);
-};
+// exports.isDateISO = (rawString) => {
+//   return ISO_DATE.test(rawString);
+// };
 
 /**
  *
@@ -60,7 +67,6 @@ exports.listCronDates = (cronExpression, params = {}) => {
       try {
         const obj = interval.next();
         dates.push(obj.value.toISOString());
-        console.log('value:', obj.value.toISOString(), 'done:', obj.done);
       } catch (err) {
         break;
       }
@@ -102,4 +108,12 @@ exports.nextCronDate = (cronExpression) => {
   return date;
 };
 
+/**
+ *
+ * @param date
+ * @return {*}
+ */
+exports.formatDate = (date) => {
+  return moment(date).format('YYYY-MM-DDTHH:mm')
+};
 

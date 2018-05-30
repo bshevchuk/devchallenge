@@ -1,6 +1,6 @@
 'use strict';
 
-const listAvailableJudges = require('../service/functions/list_available_judges');
+const helper = require('./_helper');
 
 const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
@@ -8,8 +8,15 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 const assert = chai.assert;
 
+const listAvailableJudges = require('../service/functions/list_available_judges');
+
 describe('list_available_judges function', () => {
   context("handler", () => {
+    before(async () => {
+      await helper.cleanDatabase();
+      await helper.dummyGenerator(10)
+    });
+
     it('should be exported', () => {
       expect(listAvailableJudges.handler).to.be.a('function')
     });
@@ -25,7 +32,7 @@ describe('list_available_judges function', () => {
     });
   });
 
-  xcontext('httpHandler', () => {
+  context('httpHandler', () => {
     it('should export a httpHandler function', () => {
       expect(listAvailableJudges.httpHandler).to.be.a('function')
     });

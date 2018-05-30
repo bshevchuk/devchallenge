@@ -24,3 +24,4 @@ CREATE TABLE IF NOT EXISTS "availabilities" (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS "availabilities_judge_date_start_end_idx" ON "availabilities"("judge_id", "date_start","date_end");
+CREATE INDEX IF NOT EXISTS "availabilities_date_start_end_idx" ON "availabilities"("date_start","date_end");

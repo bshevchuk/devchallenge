@@ -4,6 +4,8 @@
  * Proposed function signature: ​create_availability(input_data_json)
  */
 
+const moment = require('moment-timezone');
+
 const db = require('../common/db');
 const queries = require('../common/queries');
 const utils = require('../common/utils');
@@ -67,24 +69,32 @@ const parseRequestBody = async (rawRequest) => {
       const dateStart = range['start'];
       const dateEnd = range['end'];
 
-      // dirty check of date style
-      // is an ISO8601
-      const dateStartIsIso = utils.isDateISO(dateStart);
-      const dateEndIsIso = utils.isDateISO(dateEnd);
+      // is a date (ISO,timestamp etc)?
+      const isDateStartIso = moment(dateStart).isValid();
+      const isDateEndIso = moment(utils).isValid();
       // is a cron?
-      const dateStartIsCron = dateStart.includes('*') || dateStart.includes('?');
-      const dateEndIsCron = dateEnd.includes('*') || dateEnd.includes('?');
+      const isDateStartCron = dateStart.includes('*') || dateStart.includes('?');
+      const isDateEndCron = dateEnd.includes('*') || dateEnd.includes('?');
 
-      if (dateStartIsIso && dateEndIsIso) {
+      if (isDateStartIso && isDateEndIso) {
         availabilities.push({
           start: dateStart,
           end: dateEnd
         })
-      } else if (dateStartIsCron && dateEndIsCron) {
-        const nextStartDate = utils.nextCronDate(dateStart);
-        const nextEndDate = utils.nextCronDate(dateEnd);
+      } else if (isDateStartCron && isDateEndCron) {
+        // const nextStartDate = utils.nextCronDate(dateStart);
+        // const nextEndDate = utils.nextCronDate(dateEnd);
+
         const startDates = utils.listCronDates(dateStart);
         const endDates = utils.listCronDates(dateEnd);
+
+        let count = startDates.length <= endDates.length ? startDates.length : endDates.length;
+        for(let i = 0; i < count; i++) {
+          availabilities.push({
+            start: startDates[i],
+            end: endDates[i]
+          })
+        }
       } else {
         errors.push(`${username} have unrecognized format of date in range: ${JSON.stringify(range)}`)
       }

@@ -19,7 +19,6 @@ paths:
           $ref: '#/components/responses/BadRequest'
         500:
           $ref: '#/components/responses/ServerError'
-  #/judge_availabilities:
   /fetch/{date_start}/{date_end}/{judge_name}:
     get:
       summary: When Judge Is Available
@@ -54,7 +53,6 @@ paths:
           description: Not found judge
         500:
           $ref: '#/components/responses/ServerError'
-  #/list_availabilities:
   /fetch/{date_start}/{date_end}:
     get:
       summary: List Available Judges
