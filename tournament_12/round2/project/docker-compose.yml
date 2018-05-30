@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "80:3000"
+    links:
+      - db
+    environment:
+      - PGHOST=db
+      - PGUSER=master
+      - PGPASSWORD=secret
+      - PGDATABASE=devchallenge12
+      - PGPORT=5432
+
+  db:
+    image: postgres:9.6.9
+    restart: always
+    ports:
+      - "5555:5432"
+    environment:
+      - POSTGRES_USER=master
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=devchallenge12

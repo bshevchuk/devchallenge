@@ -1,0 +1,170 @@
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: DevChallenge12 Backend r2 API
+servers:
+  - url: 'http://dockerhost'
+    description: Dockerhost
+paths:
+  /create:
+    post:
+      summary: Create (import) availabilities for judge
+      operationId: createAvailability
+      requestBody:
+        $ref: '#/components/requestBodies/CreateAvailability'
+      responses:
+        201:
+          $ref: '#/components/responses/ImportOkay'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/ServerError'
+  #/judge_availabilities:
+  /fetch/{date_start}/{date_end}/{judge_name}:
+    get:
+      summary: When Judge Is Available
+      operationId: whenJudgeIsAvailable
+      parameters:
+        - in: path
+          name: judge_name
+          required: true
+          description: Judge's username
+          schema:
+            type: string
+        - in: path
+          name: date_start
+          required: true
+          description: Start date
+          schema:
+            type: string
+            format: 'date-time'
+        - in: path
+          name: date_end
+          required: true
+          description: End date
+          schema:
+            type: string
+            format: 'date-time'
+      responses:
+        200:
+          $ref: '#/components/responses/OneJudgeAvailable'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          description: Not found judge
+        500:
+          $ref: '#/components/responses/ServerError'
+  #/list_availabilities:
+  /fetch/{date_start}/{date_end}:
+    get:
+      summary: List Available Judges
+      operationId: listAvailableJudges
+      parameters:
+        - in: path
+          name: date_start
+          required: true
+          description: Start date
+          schema:
+            type: string
+            format: 'date-time'
+        - in: path
+          name: date_end
+          required: true
+          description: End date
+          schema:
+            type: string
+            format: 'date-time'
+      responses:
+        200:
+          $ref: '#/components/responses/JudgesAvailable'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+components:
+  requestBodies:
+    CreateAvailability:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              judges:
+                type: object
+                properties:
+                  'JUDGE_USERNAME':
+                    $ref: '#/components/schemas/Judge'
+  responses:
+    ImportOkay:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+                enum:
+                  - true
+    OneJudgeAvailable:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              available:
+                type: array
+                items:
+                 type: string
+    JudgesAvailable:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              judges:
+                type: array
+                items:
+                  type: string
+    BadRequest:
+      description: Bad
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  type: string
+    ServerError:
+      description: ServerError
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              err:
+                type: string
+  schemas:
+    Judge:
+      type: object
+      properties:
+        available:
+          type: array
+          items:
+            $ref: '#/components/schemas/JudgeAvailable'
+    JudgeAvailable:
+      type: object
+      properties:
+        start:
+          type: string
+          format: 'date-time'
+          example: '2018-06-03T08:00'
+        end:
+          type: string
+          format: 'date-time'
+          example: '2018-06-03T09:00'

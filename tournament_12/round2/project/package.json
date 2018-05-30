@@ -1,0 +1,31 @@
+{
+  "name": "devchallenge12_backend_r2",
+  "private": true,
+  "version": "0.0.1",
+  "description": "DevChallenge12 Backend r2",
+  "main": "index.js",
+  "engines": {
+    "node": "8.11.1",
+    "npm": "5.6.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "mocha test/**.spec.js"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "faker": "^4.1.0",
+    "mocha": "^5.2.0",
+    "nyc": "^11.8.0",
+    "sinon": "^5.0.10"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cron-parser": "^2.5.0",
+    "express": "^4.16.3",
+    "express-promise-router": "^3.0.2",
+    "morgan": "^1.9.0",
+    "pg": "^7.4.3"
+  }
+}
