@@ -23,6 +23,8 @@ const handler = async (dateStart, dateEnd, judgeName) => {
   if (judgeId === null) {
     return { errors: [`Judge with name "${judgeName}" not found in database`] };
   }
+  dateStart = utils.transformDateToGmt(dateStart);
+  dateEnd = utils.transformDateToGmt(dateEnd);
   let available = await queries.getAvailabilitiesByJudgeId(judgeId, dateStart, dateEnd)
   available = available.map(record => {
     return {

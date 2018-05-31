@@ -12,15 +12,12 @@ const getJudgeIdByUsername = async (judgeUsername) => {
 
 /**
  *
- * @param dateStart
- * @param dateEnd
+ * @param judgeUsername
  * @returns {Promise<*>}
  */
-const getJudgesIdsAvailables = async (dateStart, dateEnd) => {
-  const { rows } = await db.query('SELECT judge_id FROM availabilities WHERE date_start >= $1 AND date_end <= $2', [dateStart, dateEnd]);
-  return rows.map(row => {
-    return parseInt(row.judge_id, 10)
-  });
+const createJudge = async (judgeUsername) => {
+  const { rows } = await db.query('INSERT INTO judges(username) VALUES($1) RETURNING id', [judgeUsername]);
+  return rows.length === 0 ? null : parseInt(rows[0].id, 10)
 };
 
 /**
@@ -37,29 +34,40 @@ const getJudgesUsernamesByIds = async (ids) => {
 
 /**
  *
+ * @param dateStart
+ * @param dateEnd
+ * @returns {Promise<*>}
+ */
+const getJudgesIdsByAvailableRange = async (dateStart, dateEnd) => {
+  // const query = 'SELECT judge_id FROM availabilities WHERE date_start >= $1 AND $2 <= date_end';
+  const query = `SELECT judge_id FROM availabilities WHERE (
+                  (date_start BETWEEN $1 AND $2) OR (date_end BETWEEN $1 AND $2)
+                )`;
+  const { rows } = await db.query(query, [dateStart, dateEnd]);
+  return rows.map(row => {
+    return parseInt(row.judge_id, 10)
+  });
+};
+
+/**
+ *
  * @param judgeId
  * @param dateStart
  * @param dateEnd
  * @returns {Promise<void>}
  */
 const getAvailabilitiesByJudgeId = async (judgeId, dateStart, dateEnd) => {
-  const { rows } = await db.query('SELECT date_start, date_end FROM availabilities WHERE judge_id = $1 AND date_start >= $2 AND date_end <= $3', [judgeId, dateStart, dateEnd]);
+  // const query = 'SELECT date_start, date_end FROM availabilities WHERE judge_id = $1 AND date_start >= $2 AND $3 <= date_end';
+  const query = `SELECT date_start, date_end FROM availabilities WHERE judge_id = $1 AND (
+                  (date_start BETWEEN $2 AND $3) OR (date_end BETWEEN $2 AND $3)
+                )`;
+  const { rows } = await db.query(query, [judgeId, dateStart, dateEnd]);
   return rows.map(row => {
     return {
       date_start: row['date_start'],
       date_end: row['date_end']
     }
   })
-};
-
-/**
- *
- * @param judgeUsername
- * @returns {Promise<*>}
- */
-const createJudge = async (judgeUsername) => {
-  const { rows } = await db.query('INSERT INTO judges(username) VALUES($1) RETURNING id', [judgeUsername]);
-  return rows.length === 0 ? null : parseInt(rows[0].id, 10)
 };
 
 /**
@@ -91,10 +99,10 @@ const bulkCreateJudgeAvailabilities = async (judgeId, availabilities) => {
  * Exports
  */
 module.exports = {
-  getJudgeIdByUsername,
-  getJudgesIdsAvailables,
-  getJudgesUsernamesByIds,
-  getAvailabilitiesByJudgeId,
   createJudge,
+  getJudgeIdByUsername,
+  getJudgesUsernamesByIds,
+  getJudgesIdsByAvailableRange,
+  getAvailabilitiesByJudgeId,
   bulkCreateJudgeAvailabilities
 };

@@ -9,6 +9,7 @@
  */
 
 const queries = require('../common/queries');
+const utils = require('../common/utils');
 
 /**
  * Main function
@@ -21,8 +22,12 @@ const handler = async (dateStart, dateEnd) => {
   if (!dateStart || !dateEnd) {
     return { errors: [`Missing "dateStart" and/or "dateEnd"`] };
   }
-
-  const judgeIds = await queries.getJudgesIdsAvailables(dateStart, dateEnd);
+  dateStart = utils.transformDateToGmt(dateStart);
+  dateEnd = utils.transformDateToGmt(dateEnd);
+  if (dateStart > dateEnd) {
+    return { errors: [`Missing "dateStart" must be lower than "dateEnd"`] };
+  }
+  const judgeIds = await queries.getJudgesIdsByAvailableRange(dateStart, dateEnd);
   const judges = await queries.getJudgesUsernamesByIds(judgeIds);
 
   return { judges: judges }

@@ -2,8 +2,8 @@ const moment = require('moment-timezone');
 const db = require('./db');
 const cronParser = require('cron-parser');
 
+const DEFAULT_TIMEZONE = 'Europe/Kiev';
 const ONE_YEAR = 365 * 24 * 3600 * 1000;
-// const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})/; // YYYY-MM-DDTHH:MM
 
 exports.ONE_YEAR = ONE_YEAR;
 
@@ -33,32 +33,32 @@ exports.transformUsername = (rawUsername) => {
 
 /**
  *
- * @param rawString
- * @returns {boolean}
+ * @param date
+ * @param timezone
+ * @return {Moment}
  */
-// exports.isDateISO = (rawString) => {
-//   return ISO_DATE.test(rawString);
-// };
+exports.transformDateToGmt = (date) => {
+  return moment(date).tz(DEFAULT_TIMEZONE).utc();
+};
+
 
 /**
  *
  * @param cronExpression
- * @param params Object: "tz"
+ * @param mineStartDate
  * @returns {Array}
  */
-exports.listCronDates = (cronExpression, params = {}) => {
+exports.listCronDates = (cronExpression, mineStartDate) => {
   const dates = [];
 
-  const currentDate = new Date();
+  const currentDate = mineStartDate ? mineStartDate : new Date();
   const endDate = currentDate.getTime() + ONE_YEAR;
-  const defaultOptions = {
+  const options = {
     currentDate,
     endDate,
     iterator: true,
-    utc: true,
-    // tz: 'Europe/Kiev'
+    tz: DEFAULT_TIMEZONE
   };
-  const options = Object.assign(defaultOptions, params);
 
   try {
     const interval = cronParser.parseExpression(cronExpression, options);
@@ -77,43 +77,14 @@ exports.listCronDates = (cronExpression, params = {}) => {
   return dates;
 };
 
-/**
- *
- * @param cronExpression
- * @returns {*}
- */
-exports.nextCronDate = (cronExpression) => {
-  let date = null;
-  const currentDate = new Date();
-  const options = {
-    currentDate,
-    utc: true,
-    // tz: 'Europe/Kiev'
-  };
-  try {
-    const interval = cronParser.parseExpression(cronExpression, options);
-
-    while (true) {
-      try {
-        const obj = interval.next();
-        date = obj.value.toISOString();
-        console.log('value:', obj.value.toISOString());
-      } catch (err) {
-        break;
-      }
-    }
-  } catch (err) {
-    console.error(err.message);
-  }
-  return date;
-};
 
 /**
  *
  * @param date
+ * @timezone date
  * @return {*}
  */
-exports.formatDate = (date) => {
-  return moment(date).format('YYYY-MM-DDTHH:mm')
+exports.formatDate = (date, timezone = DEFAULT_TIMEZONE) => {
+  return moment.tz(date, timezone).format('YYYY-MM-DDTHH:mm')
 };
 

@@ -64,39 +64,38 @@ const parseRequestBody = async (rawRequest) => {
     available.forEach(range => {
       if (!exists(range, 'start') || !exists(range, 'end')) {
         isValid = false;
-        errors.push(`${username} with missing "start" and/or "end" in range: ${JSON.stringify(range)}`)
+        errors.push(`"${username}" with missing "start" and/or "end" in range: ${JSON.stringify(range)}`)
       }
       const dateStart = range['start'];
       const dateEnd = range['end'];
 
-      // is a date (ISO,timestamp etc)?
-      const isDateStartIso = moment(dateStart).isValid();
-      const isDateEndIso = moment(utils).isValid();
-      // is a cron?
+      // is a cron expression?
       const isDateStartCron = dateStart.includes('*') || dateStart.includes('?');
       const isDateEndCron = dateEnd.includes('*') || dateEnd.includes('?');
 
-      if (isDateStartIso && isDateEndIso) {
-        availabilities.push({
-          start: dateStart,
-          end: dateEnd
-        })
-      } else if (isDateStartCron && isDateEndCron) {
-        // const nextStartDate = utils.nextCronDate(dateStart);
-        // const nextEndDate = utils.nextCronDate(dateEnd);
-
+      if (isDateStartCron && isDateEndCron) {
         const startDates = utils.listCronDates(dateStart);
         const endDates = utils.listCronDates(dateEnd);
 
         let count = startDates.length <= endDates.length ? startDates.length : endDates.length;
-        for(let i = 0; i < count; i++) {
+        for (let i = 0; i < count; i++) {
           availabilities.push({
             start: startDates[i],
             end: endDates[i]
           })
         }
       } else {
-        errors.push(`${username} have unrecognized format of date in range: ${JSON.stringify(range)}`)
+        // is a date (ISO, Unix epoch timestamp etc)?
+        const isDateStartIso = moment(dateStart).isValid();
+        const isDateEndIso = moment(utils).isValid();
+        if (isDateStartIso && isDateEndIso) {
+          availabilities.push({
+            start: utils.transforemDateToGmt(dateStart),
+            end: utils.transformDateToGmt(dateEnd)
+          })
+        } else {
+          errors.push(`"${username}" have unrecognized format of date in range: ${JSON.stringify(range)}`)
+        }
       }
     });
 

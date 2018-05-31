@@ -13,7 +13,7 @@
 
 [+] Realization: ​Store repeat patterns.
 
-[+/-] Realization: ​Deal with timezones and DST.
+[+] Realization: ​Deal with timezones and DST.
 
 [+/-] Realization: ​Generate synthetic data and tests.
 
@@ -132,7 +132,7 @@ If you familiar with OpenApi (Swagger) you can open file `openapi.yml` and parse
 
   Example: 
   
-  `curl -v -X POST -H "content-type: application/json" http://dockerhost/create --data @test/fixtures/valid_sample1.json`
+  `curl -v -X POST -H "content-type: application/json" http://dockerhost/create --data @test/_fixtures/valid_sample1.json`
   
   Response: 
   
@@ -191,11 +191,14 @@ Generating 100_000 judges approximately takes 5 minutes (million ~ a hour)
 
 ---
 
-### Test
+### Tests
 
-You can run test in docker like `docker exec -it dc12_backend_r2_app_1 npm run test`
+⚠️ WARNING: This remove all data in database.
 
-WARNING: This remove all data in database.
+Run unit tests: `docker exec -it dc12_backend_r2_app_1 npm run test`
+
+See coverage report: `docker exec -it dc12_backend_r2_app_1 npm run coverage`
+
 
 
 #### Database queries analyze (performance test???)

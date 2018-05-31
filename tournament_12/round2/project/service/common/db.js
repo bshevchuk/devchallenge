@@ -19,14 +19,3 @@ pool.on('error', (err, client) => {
 });
 
 module.exports.query = (text, params) => pool.query(text, params);
-
-
-// (async () => {
-//   const client = await pool.connect()
-//   try {
-//     const res = await client.query('SELECT * FROM users WHERE id = $1', [1])
-//     console.log(res.rows[0])
-//   } finally {
-//     client.release()
-//   }
-// })().catch(e => console.log(e.stack))

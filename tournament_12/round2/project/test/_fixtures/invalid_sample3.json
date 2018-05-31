@@ -1,0 +1,12 @@
+{
+  "judges": {
+    "dmytro": {
+      "available": [
+        {
+          "date_start": "This a fake",
+          "date_end": "This a fake"
+        }
+      ]
+    }
+  }
+}
