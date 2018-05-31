@@ -19,6 +19,7 @@ const fixture2 = require('../_fixtures/valid_sample2.json');
 const invalidFixture1 = require('../_fixtures/invalid_sample1.json');
 const invalidFixture2 = require('../_fixtures/invalid_sample2.json');
 const invalidFixture3 = require('../_fixtures/invalid_sample3.json');
+const invalidFixture4 = require('../_fixtures/invalid_sample4.json');
 
 const createAvailability = require('../../service/functions/create_availability');
 
@@ -49,6 +50,13 @@ describe('function: #create_availability', () => {
       const user1 = await queries.getJudgeIdByUsername('dmytro');
       expect(user1).to.not.be.null;
       expect(handlerResult).to.be.true;
+    });
+
+    it('should return errors whe import "invalid_sample4.json"', async () => {
+      const handlerResult = await createAvailability.handler(invalidFixture4);
+      expect(handlerResult.errors).to.be;
+      expect(handlerResult.errors[0]).to.eq('"date_start" must be lower than "date_end" in range: {"end":"15 14 1 * *","start":"15 15 1 * *"}')
+      expect(handlerResult.errors[1]).to.eq('"date_start" must be lower than "date_end" in range: {"end":"2018-06-03T08:00Z","start":"2018-06-03T09:00Z"}')
     });
   });
 

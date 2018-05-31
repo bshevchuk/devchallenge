@@ -5,6 +5,8 @@ info:
 servers:
   - url: 'http://dockerhost'
     description: Dockerhost
+  - url: 'http://localhost:3000'
+    description: Local
 paths:
   /create:
     post:
@@ -44,6 +46,19 @@ paths:
           schema:
             type: string
             format: 'date-time'
+        - in: query
+          name: tz
+          description: Timezone
+          schema:
+            type: string
+            enum:
+              - America/Los_Angeles
+              - America/New_York
+              - GMT
+              - Europe/Zurich
+              - Europe/Kiev
+              - Asia/Dubai
+              - Australia/Sydney
       responses:
         200:
           $ref: '#/components/responses/OneJudgeAvailable'
@@ -72,6 +87,19 @@ paths:
           schema:
             type: string
             format: 'date-time'
+        - in: query
+          name: tz
+          description: Timezone
+          schema:
+            type: string
+            enum:
+              - America/Los_Angeles
+              - America/New_Yourk
+              - GMT
+              - Europe/Zurich
+              - Europe/Kiev
+              - Asia/Dubai
+              - Australia/Sydney
       responses:
         200:
           $ref: '#/components/responses/JudgesAvailable'

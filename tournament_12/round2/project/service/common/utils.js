@@ -3,8 +3,9 @@ const db = require('./db');
 const cronParser = require('cron-parser');
 
 const DEFAULT_TIMEZONE = 'Europe/Kiev';
-const ONE_YEAR = 365 * 24 * 3600 * 1000;
+exports.DEFAULT_TIMEZONE = DEFAULT_TIMEZONE;
 
+const ONE_YEAR = 365 * 24 * 3600 * 1000;
 exports.ONE_YEAR = ONE_YEAR;
 
 /**
@@ -34,11 +35,11 @@ exports.transformUsername = (rawUsername) => {
 /**
  *
  * @param date
- * @param timezone
+ * @param tz
  * @return {Moment}
  */
-exports.transformDateToGmt = (date) => {
-  return moment(date).tz(DEFAULT_TIMEZONE).utc();
+exports.transformDateToGmt = (date, tz = DEFAULT_TIMEZONE) => {
+  return moment.tz(date, tz).utc();
 };
 
 
@@ -82,9 +83,10 @@ exports.listCronDates = (cronExpression, mineStartDate) => {
  *
  * @param date
  * @timezone date
+ * @timezone timezone
  * @return {*}
  */
 exports.formatDate = (date, timezone = DEFAULT_TIMEZONE) => {
-  return moment.tz(date, timezone).format('YYYY-MM-DDTHH:mm')
+  return moment.tz(date, timezone).format('YYYY-MM-DDTHH:mmZ')
 };
 

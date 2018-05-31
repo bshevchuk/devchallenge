@@ -113,13 +113,13 @@ describe('utils', () => {
       it('"2018-07-02T05:00:00.000Z" in "Europe/Kiev" will be "2018-07-02T08:00"', () => {
         const input = '2018-07-02T05:00:00.000Z';
         const result = utils.formatDate(input, 'Europe/Kiev');
-        expect(result).to.eq('2018-07-02T08:00') // +3
+        expect(result).to.eq('2018-07-02T08:00+03:00') // +3
       });
 
       it('"2018-07-02T05:00:00.000Z" in "America/Toronto" will be "2018-07-02T01:00"', () => {
         const input = '2018-07-02T05:00:00.000Z';
         const result = utils.formatDate(input, 'America/Toronto');
-        expect(result).to.eq('2018-07-02T01:00') // -4 (in 2018 summer begun Mar 11)
+        expect(result).to.eq('2018-07-02T01:00-04:00') // -4 (in 2018 summer begun Mar 11)
       });
     });
 
@@ -127,13 +127,13 @@ describe('utils', () => {
       it('"2018-12-02T05:00:00.000Z" in "Europe/Kiev" will be "2018-12-02T07:00" ', () => {
         const input = '2018-12-02T05:00:00.000Z';
         const result = utils.formatDate(input, 'Europe/Kiev');
-        expect(result).to.eq('2018-12-02T07:00') // +2
+        expect(result).to.eq('2018-12-02T07:00+02:00') // +2
       });
 
       it('"2018-12-02T05:00:00.000Z" in "America/Toronto" will be "2018-12-02T0:00" ', () => {
         const input = '2018-12-02T05:00:00.000Z';
         const result = utils.formatDate(input, 'America/Toronto');
-        expect(result).to.eq('2018-12-02T00:00') // -5 (in 2018 summer ends Nov 4)
+        expect(result).to.eq('2018-12-02T00:00-05:00') // -5 (in 2018 summer ends Nov 4)
       });
     })
   })

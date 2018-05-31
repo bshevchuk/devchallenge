@@ -15,21 +15,25 @@ const utils = require('../common/utils');
  * @param dateStart
  * @param dateEnd
  * @param judgeName
+ * @param tz
  * @returns {Promise<*>}
  */
-const handler = async (dateStart, dateEnd, judgeName) => {
+const handler = async (dateStart, dateEnd, judgeName, tz = utils.DEFAULT_TIMEZONE) => {
   const judgeUsername = utils.transformUsername(judgeName);
   const judgeId = await queries.getJudgeIdByUsername(judgeUsername);
   if (judgeId === null) {
     return { errors: [`Judge with name "${judgeName}" not found in database`] };
   }
-  dateStart = utils.transformDateToGmt(dateStart);
-  dateEnd = utils.transformDateToGmt(dateEnd);
-  let available = await queries.getAvailabilitiesByJudgeId(judgeId, dateStart, dateEnd)
+  dateStart = utils.transformDateToGmt(dateStart, tz);
+  dateEnd = utils.transformDateToGmt(dateEnd, tz);
+  if (dateStart > dateEnd) {
+    return { errors: [`"dateStart" must be lower than "dateEnd"`] };
+  }
+  let available = await queries.getAvailabilitiesByJudgeId(judgeId, dateStart, dateEnd);
   available = available.map(record => {
     return {
-      date_start: utils.formatDate(record.date_start),
-      date_end: utils.formatDate(record.date_end)
+      date_start: utils.formatDate(record.date_start, tz),
+      date_end: utils.formatDate(record.date_end, tz)
     }
   });
 
@@ -44,8 +48,9 @@ const handler = async (dateStart, dateEnd, judgeName) => {
  */
 const httpHandler = async (req, res) => {
   try {
-    const { date_start, date_end, judge_name } = req.params;
-    const result = await handler(date_start, date_end, judge_name);
+    let { date_start, date_end, judge_name } = req.params;
+    const { tz } = req.query;
+    const result = await handler(date_start, date_end, judge_name, tz);
     const available = result.available;
     const errors = result.errors;
     if (available) {

@@ -1,4 +1,12 @@
-const { Pool } = require('pg');
+const pg = require('pg');
+
+// without this pg transform "timestamp without time zone" in local timezone
+// with this - to UTC+0
+pg.types.setTypeParser(1114, function(stringValue) {
+  return new Date(stringValue + 'Z')
+});
+
+const Pool = pg.Pool;
 const process = require('process');
 
 const pool = new Pool({

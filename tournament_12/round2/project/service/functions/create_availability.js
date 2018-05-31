@@ -66,16 +66,20 @@ const parseRequestBody = async (rawRequest) => {
         isValid = false;
         errors.push(`"${username}" with missing "start" and/or "end" in range: ${JSON.stringify(range)}`)
       }
-      const dateStart = range['start'];
-      const dateEnd = range['end'];
+      const rawDateStart = range['start'];
+      const rawDateEnd = range['end'];
 
       // is a cron expression?
-      const isDateStartCron = dateStart.includes('*') || dateStart.includes('?');
-      const isDateEndCron = dateEnd.includes('*') || dateEnd.includes('?');
+      const isDateStartCron = rawDateStart.includes('*') || rawDateStart.includes('?');
+      const isDateEndCron = rawDateEnd.includes('*') || rawDateEnd.includes('?');
 
       if (isDateStartCron && isDateEndCron) {
-        const startDates = utils.listCronDates(dateStart);
-        const endDates = utils.listCronDates(dateEnd);
+        const startDates = utils.listCronDates(rawDateStart);
+        const endDates = utils.listCronDates(rawDateEnd);
+
+        if (startDates[0] > endDates[0]) {
+          errors.push(`"date_start" must be lower than "date_end" in range: ${JSON.stringify(range)}`);
+        }
 
         let count = startDates.length <= endDates.length ? startDates.length : endDates.length;
         for (let i = 0; i < count; i++) {
@@ -86,12 +90,17 @@ const parseRequestBody = async (rawRequest) => {
         }
       } else {
         // is a date (ISO, Unix epoch timestamp etc)?
-        const isDateStartIso = moment(dateStart).isValid();
-        const isDateEndIso = moment(utils).isValid();
+        const isDateStartIso = moment(rawDateStart).isValid();
+        const isDateEndIso = moment(rawDateEnd).isValid();
         if (isDateStartIso && isDateEndIso) {
+          const dateStart = utils.transformDateToGmt(rawDateStart);
+          const dateEnd = utils.transformDateToGmt(rawDateEnd);
+          if (dateStart > dateEnd) {
+            errors.push(`"date_start" must be lower than "date_end" in range: ${JSON.stringify(range)}`);
+          }
           availabilities.push({
-            start: utils.transforemDateToGmt(dateStart),
-            end: utils.transformDateToGmt(dateEnd)
+            start: dateStart,
+            end: dateEnd
           })
         } else {
           errors.push(`"${username}" have unrecognized format of date in range: ${JSON.stringify(range)}`)

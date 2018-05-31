@@ -3,21 +3,21 @@
 
 ### Checklist
 
-[+] Realization: Create availability intervals from example data
+[ + ] Realization: Create availability intervals from example data
 
-[+] Realization: Query judge for his availability
+[ + ] Realization: Query judge for his availability
 
-[+] Realization: List judges that are available within time interval
+[ + ] Realization: List judges that are available within time interval
 
-[+] One-click launch
+[ + ] One-click launch
 
-[+] Realization: ​Store repeat patterns.
+[ + ] Realization: ​Store repeat patterns.
 
-[+] Realization: ​Deal with timezones and DST.
+[ + ] Realization: ​Deal with timezones and DST.
 
 [+/-] Realization: ​Generate synthetic data and tests.
 
-[-] Describe performance of your data storage and functions in O-notation.
+[ - ] Describe performance of your data storage and functions in O-notation.
 
 
 ### Tech Stack
@@ -26,18 +26,6 @@ Language: JavaScript (Node.js v8.11)
 
 Database: Postgres 9.6
 
-
-### Schema
-
-I'm purpose to use two tables: 
-
-`judges` (with id and username) and 
-
-`availabilities` (with reference to judges and two timestamp fields for start & end ranges)
-
-Also availabilities have some indexes.
-
-See `./schema.sql` file.
 
 ### File Structure
 
@@ -72,7 +60,34 @@ See `./schema.sql` file.
 * `schema.sql` - SQL schema
 
 
----
+### Database Schema
+
+I'm purpose to use two tables: 
+
+`judges` (with id and username) and 
+
+`availabilities` (with reference to judges and two timestamp fields for start & end ranges)
+
+Also "availabilities" have some indexes.
+
+See `./schema.sql` file.
+
+
+### Notes
+
+Service transform date to GMT (UTC+0) before saving into database.
+
+Set timezone "Europe/Kiev" for dates without explicit UTC offset (e.g. `2018-06-01T08:00` or `0 8 * * MON-FRI` will transform to GMT) .
+
+If date passed without hours - that mean "0 hour 0 minute 0 second"
+
+Help sites:
+
+  * http://editor.swagger.io For API
+  
+  * https://crontab.guru for CRON expression
+  
+  * https://www.timeanddate.com/worldclock/converter.html for timezone conversion
 
 ### Start Server
 
@@ -122,11 +137,11 @@ If you familiar with OpenApi (Swagger) you can open file `openapi.yml` and parse
   
   Where 'JUDGE_USERNAME_ONE' and 'JUDGE_USERNAME_TWO' is usernames (username will transform to lower case before send query to database).
   
-  JUDGE_TWO have cron-style (you can use https://crontab.guru for visual feedback) for available range 
-  (in example above JUDGE_TWO available every working day from 8AM to 12PM). 
+  JUDGE_TWO have cron-style for available range (in example above JUDGE_TWO available every working day from 8AM to 12PM). 
   
   When app detect a cron-style it create a massive of dates for the next 365 days (that not support queries into past). 
-  In real app we can: 1) narrow or extend the max date for cron-style dates (dependents of our max limit in calendar); 
+  In real app we can: 
+  1) narrow or extend the max date for cron-style dates (dependents of our max limit in calendar); 
   2) save cron-pattern for users and latest available date
   3) setup cron job (runs every day) that compare latest available date (per user) and our max limit in calendar
 
@@ -139,9 +154,11 @@ If you familiar with OpenApi (Swagger) you can open file `openapi.yml` and parse
     HTTP Status 201 (empty body)
     
     
-* `GET /fetch/{date_start}/{date_end}/{judge_name}`
+* `GET /fetch/{date_start}/{date_end}/{judge_name}?tz={tz}`
 
   `{date_start}` and `{date_end}` is an ISO8601 date
+  
+  `{tz}` is optional
 
   Example:
   
@@ -153,16 +170,18 @@ If you familiar with OpenApi (Swagger) you can open file `openapi.yml` and parse
   {
     "available": [
       {
-        "date_start": "2018-06-01T05:00",
-        "date_end": "2018-06-01T09:00"
+        "date_start": "2018-06-01T05:00+03:00",
+        "date_end": "2018-06-01T09:00+03:00"
       }
     ]
   }
   ```
 
-* `GET /fetch/{date_start}/{date_end}`
+* `GET /fetch/{date_start}/{date_end}?tz={tz}`
 
   `{date_start}` and `{date_end}` is an ISO8601 date
+  
+  `{tz}` is optional
 
   Example:
   
@@ -198,26 +217,3 @@ Generating 100_000 judges approximately takes 5 minutes (million ~ a hour)
 Run unit tests: `docker exec -it dc12_backend_r2_app_1 npm run test`
 
 See coverage report: `docker exec -it dc12_backend_r2_app_1 npm run coverage`
-
-
-
-#### Database queries analyze (performance test???)
-
-In test score (can't attach because dump is over 1.08GB): judges - 1_000_010 records, availabilities - 18_171_164 records
-
-Min start date: 2018-05-30 18:40:00
-
-Max end date: 2019-05-30 19:41:00
-
-No | Query | Execution time
----|-------|----------------
-1  | `SELECT judge_id FROM availabilities WHERE date_start >= '2018-06-01' AND date_end <= '2019-06-10'` | 4_404.702 ms
-2  | `SELECT username FROM judges WHERE id = ANY(array[454754, ...])` | 570.284 ms
-3  | `SELECT username FROM judges WHERE id IN (SELECT judge_id FROM availabilities WHERE date_start >= '2018-06-01' AND date_end <= '2019-06-10')` | 30_929.213 ms
-4  | `SELECT DISTINCT judge_id FROM availabilities WHERE date_start >= '2018-06-01' AND date_end <= '2019-06-10'` | 36_189.319 ms
-5  | `SELECT date_start, date_end FROM availabilities WHERE judge_id = 866554 AND date_start >= '2018-06-01' AND date_end <= '2019-06-10';` | 0.958 ms
-
-For retrieve list of judges in range this more efficient to split into two queries (1), (2) and without DISTINCT (postgresql remove duplicates).
-
-For retrieve judges's range by id (5) postgresql use index "availabilities_judge_date_start_end_idx"
-

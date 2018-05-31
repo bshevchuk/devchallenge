@@ -55,8 +55,8 @@ describe('function: #when_judge_is_available', () => {
       const handlerResult = await whenJudgeIsAvailable.handler('2018-06-03', '2018-06-04', 'alice');
       expect(handlerResult).to.be.an('object');
       expect(utils.exists(handlerResult, 'available')).to.be.true;
-      expect(handlerResult.available[0].date_start).to.eq('2018-06-03T09:00'); // in Europe/Kiev timezone
-      expect(handlerResult.available[0].date_end).to.eq('2018-06-03T13:00');
+      expect(handlerResult.available[0].date_start).to.eq('2018-06-03T09:00+03:00'); // in Europe/Kiev timezone
+      expect(handlerResult.available[0].date_end).to.eq('2018-06-03T13:00+03:00');
     });
   });
 

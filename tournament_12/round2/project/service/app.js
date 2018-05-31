@@ -3,9 +3,11 @@ const express = require('express');
 const morgan = require('morgan');
 const compression = require('compression');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const appRoutes = require('./routes');
 
 const app = express();
+app.use(cors())
 app.use(compression());
 app.use(morgan('common'));
 app.use(bodyParser.json());
